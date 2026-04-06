@@ -2,6 +2,7 @@ const userModel = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt =require("jsonwebtoken");
 const blacklistModel = require("../models/blacklist.model")
+const redis = require("../config/cache");
 
 
 async function registerUser(req, res) {
@@ -117,7 +118,13 @@ async function logoutUser(req,res) {
 
     res.clearCookie("token")
 
-    await blacklistModel.create({token})
+    // await blacklistModel.create({token})
+    //now token is stored in redis instead of mongodb, because redis is faster than mongodb and we only need to store token for 3 days, so we can set an expiry time for the token in redis
+    await redis.set(token, Date.now().toString(),"EX", 60*60*24*3) //3 din tak blacklisted rahega
+
+
+    //redis stores data in key value pair
+    //js mai object bhi key value pair use krta hai
 
     res.status(200).json({
         message:"logout successfull"
