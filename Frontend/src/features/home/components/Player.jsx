@@ -28,7 +28,6 @@ const Player = () => {
 
     // Reset player when song changes
     useEffect(() => {
-        console.log(song.title)
         if (audioRef.current) {
             audioRef.current.load()
             setIsPlaying(false)
